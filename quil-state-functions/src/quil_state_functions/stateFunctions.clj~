@@ -5,10 +5,16 @@
 	;	  [quil-state-functions.snake.states :as states])
 )
 
+(defn wrap-var [kv]
+	(let [key (first kv) 
+	      val (second kv)]
+	(ref val))	
+)
+
 (defn setup-state [coll]
-	;(println (apply set-state! (vec (interleave (map (fn [key var] key) coll) (map (fn [key var] (if (fn? var) var (ref var))) coll)))))
+	(println (interleave (keys coll) (map wrap-var coll)))
 	;(if (map? coll) (apply set-state! (vec (interleave (map (fn [key var] key) coll) (map (fn [key var] (if (fn? var) var (ref var))) coll)))))
-	;(apply set-state! (vec (interleave (take-nth 2 coll) (map (fn [key var] (if (fn? var) var (ref var))) coll))))
+	(apply set-state! (interleave (keys coll) (map wrap-var coll)))
 )
 
 (defn update-state [key set]
