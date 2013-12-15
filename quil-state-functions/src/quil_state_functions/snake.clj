@@ -9,7 +9,7 @@
 (defn setup []
 	(background-color "white")
 	(update-state :foodExists true)
-	(frame-rate 5)
+	(frame-rate 10)
 )
 
 (defn update-snake-position []
@@ -37,16 +37,14 @@
 	        y1 (get-value :snakeHeadY)
 	        x2 (get-value :foodX)
 	        y2 (get-value :foodY)
-		newcoll ((if (and (and (>= y1 (- y2 10)) (<= y1 (+ y2 10))) (and (>= x1 (- x2 10)) (<= x1 (+ x2 10))))
-			(cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) coll))
-			(cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) (drop-last 2 coll))))
-		)
-	)]
+		newcoll (vec (cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) (if (and (and (>= y1 (- y2 10)) (<= y1 (+ y2 10))) (and (>= x1 (- x2 10)) (<= x1 (+ x2 10))))
+			coll
+			(drop-last 2 coll)))))]
 	(loop [s newcoll x 0]
-		(if (= (/ (count (get-value :snake)) 2) x) (newcoll)
+		(if (= (/ (count newcoll) 2) x) newcoll
 		(do (draw-rect (first s) (second s) 20 20 "green") (recur (drop 2 s) (inc x))))
 	)
-)
+))
 
 (defn controls []
 	(cond 
@@ -75,7 +73,7 @@
 )
 
 (defn draw-sketch []
-	(update-state :snake ((:snake (get-value :updates)) (get-value :snake)))
+	(update-state :snake (:snake (get-value :updates) (get-value :snake)))
 )
 
 
