@@ -1,8 +1,17 @@
 (ns quil-state-functions.stateFunctions
 	(:use [clojure.test]
               [quil.core])
-	;(:require [quil-state-functions.snake.updates :as updates]
-	;	  [quil-state-functions.snake.states :as states])
+)
+;;Example of student code for show function :snake fn[coords] (map (rect #(:x %) #(:y %) "green" 100 100) coords) 
+;;Two possible options for dealing with order, extra level passed in to their function, or possible "z" axis (mergesort shapes by  axis before drawing)
+;;Possible third option, pass in a display order vector that would be a vector of the student's keywords that would specify the order in which to draw the shapes
+
+(def color-codes
+     {:red [255 0 0] :blue [0 0 255] :yellow [255 255 0] :green [0 128 0] :purple [128 0 128] :orange [255 165 0] :pink [255 192 203] :black [0 0 0] :brown [165 42 42] :white [255 255 255] :grey [128 128 128] :silver [192 192 192] :gold [255 215 0] :cyan [0 255 255] :magenta [255 0 255] :maroon [128 0 0] :navy [0 0 128] :lime [0 255 0] :teal [0 128 128]}
+)
+
+(def list-of-key-codes
+     {:38 "UP-ARROW" :40 "DOWN-ARROW" :37 "LEFT-ARROW" :39 "RIGHT-ARROW" :32 "SPACE" :16 "SHIFT" :9 "TAB" :8 "BACKSPACE" :10 "ENTER" :17 "CTRL" :18 "ALT" :192 "`" :222 "'"}
 )
 
 (defn wrap-var [kv]
@@ -47,161 +56,26 @@
 ;; transparent colors too
 
 (defn fill-color [str & [transparency]]
+      (let [color-key ((keyword str) color-codes)]
 	(if (= transparency nil) (do (let [transparency 1000] 
-		(cond
-	 	 ;; Base colors
-	  	 (= str "red") (fill 255 0 0 transparency)
-	  	 (= str "blue") (fill 0 0 255 transparency)
-	  	 (= str "yellow") (fill 255 255 0 transparency)
-	  	 (= str "green") (fill 0 128 0 transparency)
-	  	 (= str "purple") (fill 128 0 128 transparency)
-	  	 (= str "orange") (fill 255 165 0 transparency)
-	  	 (= str "pink") (fill 255 192 203 transparency)
-	  	 (= str "black") (fill 0 0 0 transparency)
-		 (= str "brown") (fill 165 42 42 transparency)
-	  	 (= str "white") (fill 255 255 255 transparency)
-	  	 (= str "gray") (fill 128 128 128 transparency)
-	  	 (= str "grey") (fill 128 128 128 transparency)
-	  	 (= str "silver") (fill 192 192 192 transparency)
-	  	 (= str "gold") (fill 255 215 0 transparency)
-	  	 (= str "cyan") (fill 0 255 255 transparency)
-	  	 (= str "magenta") (fill 255 0 255 transparency)
-	  	 (= str "maroon") (fill 128 0 0 transparency)
-	 	 (= str "navy") (fill 0 0 128 transparency)
-	  	 (= str "lime") (fill 0 255 0 transparency)
-	  	 (= str "teal") (fill 0 128 128 transparency)
-		 (= str "random-color") (fill (random 255) (random 255) (random 255) transparency)
-		)))
-		(cond
-	 	 (= str "red") (fill 255 0 0 transparency)
-	 	 (= str "blue") (fill 0 0 255 transparency)
-	 	 (= str "yellow") (fill 255 255 0 transparency)
-	 	 (= str "green") (fill 0 128 0 transparency)
-	 	 (= str "purple") (fill 128 0 128 transparency)
-	 	 (= str "orange") (fill 255 165 0 transparency)
-	 	 (= str "pink") (fill 255 192 203 transparency)
-	 	 (= str "black") (fill 0 0 0 transparency)
-		 (= str "brown") (fill 165 42 42 transparency)
-	 	 (= str "white") (fill 255 255 255 transparency)
-	 	 (= str "gray") (fill 128 128 128 transparency)
-	  	 (= str "grey") (fill 128 128 128 transparency)
-	 	 (= str "silver") (fill 192 192 192 transparency)
-	 	 (= str "gold") (fill 255 215 0 transparency)
-	  	 (= str "cyan") (fill 0 255 255 transparency)
-	  	 (= str "magenta") (fill 255 0 255 transparency)
-	 	 (= str "maroon") (fill 128 0 0 transparency)
-	 	 (= str "navy") (fill 0 0 128 transparency)
-	  	 (= str "lime") (fill 0 255 0 transparency)
-	  	 (= str "teal") (fill 0 128 128 transparency)
-		 (= str "random-color") (fill (random 255) (random 255) (random 255) transparency)
-		)
-	)
+		(fill (first color-key) (second color-key) (last color-key) transparency)))
+		(fill (first color-key) (second color-key) (last color-key) transparency)))
 )
 
 (defn background-color [str & [transparency]]
-	(if (= transparency nil) (do (let [transparency 1000] 
-		(cond
-	 	 ;; Base colors
-	  	 (= str "red") (background 255 0 0 transparency)
-	  	 (= str "blue") (background 0 0 255 transparency)
-	  	 (= str "yellow") (background 255 255 0 transparency)
-	  	 (= str "green") (background 0 128 0 transparency)
-	  	 (= str "purple") (background 128 0 128 transparency)
-	  	 (= str "orange") (background 255 165 0 transparency)
-	  	 (= str "pink") (background 255 192 203 transparency)
-	  	 (= str "black") (background 0 0 0 transparency)
-		 (= str "brown") (background 165 42 42 transparency)
-	  	 (= str "white") (background 255 255 255 transparency)
-	  	 (= str "gray") (background 128 128 128 transparency)
-	  	 (= str "grey") (background 128 128 128 transparency)
-	  	 (= str "silver") (background 192 192 192 transparency)
-	  	 (= str "gold") (background 255 215 0 transparency)
-	  	 (= str "cyan") (background 0 255 255 transparency)
-	  	 (= str "magenta") (background 255 0 255 transparency)
-	  	 (= str "maroon") (background 128 0 0 transparency)
-	 	 (= str "navy") (background 0 0 128 transparency)
-	  	 (= str "lime") (background 0 255 0 transparency)
-	  	 (= str "teal") (background 0 128 128 transparency)
-		 (= str "random-color") (background (random 255) (random 255) (random 255) transparency)
-		)))
-		(cond
-	 	 (= str "red") (background 255 0 0 transparency)
-	 	 (= str "blue") (background 0 0 255 transparency)
-	 	 (= str "yellow") (background 255 255 0 transparency)
-	 	 (= str "green") (background 0 128 0 transparency)
-	 	 (= str "purple") (background 128 0 128 transparency)
-	 	 (= str "orange") (background 255 165 0 transparency)
-	 	 (= str "pink") (background 255 192 203 transparency)
-	 	 (= str "black") (background 0 0 0 transparency)
-		 (= str "brown") (background 165 42 42 transparency)
-	 	 (= str "white") (background 255 255 255 transparency)
-	 	 (= str "gray") (background 128 128 128 transparency)
-	  	 (= str "grey") (background 128 128 128 transparency)
-	 	 (= str "silver") (background 192 192 192 transparency)
-	 	 (= str "gold") (background 255 215 0 transparency)
-	  	 (= str "cyan") (background 0 255 255 transparency)
-	  	 (= str "magenta") (background 255 0 255 transparency)
-	 	 (= str "maroon") (background 128 0 0 transparency)
-	 	 (= str "navy") (background 0 0 128 transparency)
-	  	 (= str "lime") (background 0 255 0 transparency)
-	  	 (= str "teal") (background 0 128 128 transparency)
-		 (= str "random-color") (background (random 255) (random 255) (random 255) transparency)
-		)
-	)
+       (let [color-key ((keyword str) color-codes)]
+	(if (= transparency nil) (do (let [transparency 1000]
+	    (background (first color-key) (second color-key) (last color-key) transparency)))
+	     (background (first color-key) (second color-key) (last color-key) transparency)))
 )
+		
 
 (defn stroke-color [str & [transparency]]
+	(let [color-key ((keyword str) color-codes)]
 	(if (= transparency nil) (do (let [transparency 1000] 
-		(cond
-	 	 ;; Base colors
-	  	 (= str "red") (stroke 255 0 0 transparency)
-	  	 (= str "blue") (stroke 0 0 255 transparency)
-	  	 (= str "yellow") (stroke 255 255 0 transparency)
-	  	 (= str "green") (stroke 0 128 0 transparency)
-	  	 (= str "purple") (stroke 128 0 128 transparency)
-	  	 (= str "orange") (stroke 255 165 0 transparency)
-	  	 (= str "pink") (stroke 255 192 203 transparency)
-	  	 (= str "black") (stroke 0 0 0 transparency)
-	  	 (= str "white") (stroke 255 255 255 transparency)
-		 (= str "brown") (stroke 165 42 42 transparency)
-	  	 (= str "gray") (stroke 128 128 128 transparency)
-	  	 (= str "grey") (stroke 128 128 128 transparency)
-	  	 (= str "silver") (stroke 192 192 192 transparency)
-	  	 (= str "gold") (stroke 255 215 0 transparency)
-	  	 (= str "cyan") (stroke 0 255 255 transparency)
-	  	 (= str "magenta") (stroke 255 0 255 transparency)
-	  	 (= str "maroon") (stroke 128 0 0 transparency)
-	 	 (= str "navy") (stroke 0 0 128 transparency)
-	  	 (= str "lime") (stroke 0 255 0 transparency)
-	  	 (= str "teal") (stroke 0 128 128 transparency)
-		 (= str "random-color") (stroke (random 255) (random 255) (random 255) transparency)
-		)))
-		(cond
-	 	 (= str "red") (stroke 255 0 0 transparency)
-	 	 (= str "blue") (stroke 0 0 255 transparency)
-	 	 (= str "yellow") (stroke 255 255 0 transparency)
-	 	 (= str "green") (stroke 0 128 0 transparency)
-	 	 (= str "purple") (stroke 128 0 128 transparency)
-	 	 (= str "orange") (stroke 255 165 0 transparency)
-	 	 (= str "pink") (stroke 255 192 203 transparency)
-	 	 (= str "black") (stroke 0 0 0 transparency)
-		 (= str "brown") (stroke 165 42 42 transparency)
-	 	 (= str "white") (stroke 255 255 255 transparency)
-	 	 (= str "gray") (stroke 128 128 128 transparency)
-	  	 (= str "grey") (stroke 128 128 128 transparency)
-	 	 (= str "silver") (stroke 192 192 192 transparency)
-	 	 (= str "gold") (stroke 255 215 0 transparency)
-	  	 (= str "cyan") (stroke 0 255 255 transparency)
-	  	 (= str "magenta") (stroke 255 0 255 transparency)
-	 	 (= str "maroon") (stroke 128 0 0 transparency)
-	 	 (= str "navy") (stroke 0 0 128 transparency)
-	  	 (= str "lime") (stroke 0 255 0 transparency)
-	  	 (= str "teal") (stroke 0 128 128 transparency)
-		 (= str "random-color") (stroke (random 255) (random 255) (random 255) transparency)
-		)
-	)
+	 (stroke (first color-key) (second color-key) (last color-key) transparency)))
+	 (stroke (first color-key) (second color-key) (last color-key) transparency)))
 )
-
 
 ;;Text
 ;;List of available fonts in text file "Fonts.txt"
@@ -270,31 +144,31 @@
 ))
 
 ;;key-codes
+;(defn key-input []
+;      (println (key-code))
+;      (println (keyword (key-code)))
+;	(let [key ((keyword (key-code)) list-of-key-codes)]
+;	     (if (nil? key) (char (key-code))
+;		key))
+;)
+
 (defn key-input []
-	(cond 
-		(= (key-code) 38) "UP-ARROW"
-		(= (key-code) 40) "DOWN-ARROW"
-		(= (key-code) 37) "LEFT-ARROW"
-		(= (key-code) 39) "RIGHT-ARROW"
-		(= (key-code) 32) "SPACE"
-		(= (key-code) 16) "SHIFT"
-		(= (key-code) 9) "TAB"
-		(= (key-code) 8) "BACKSPACE"
-		(= (key-code) 10) "ENTER"
-		(= (key-code) 17) "CTRL"
-		(= (key-code) 18) "ALT"
-		(= (key-code) 192) "`"
-		(= (key-code) 222) "'"
-		:else (char (key-code))
-	)
+        (cond 
+                (= (key-code) 38) "UP-ARROW"
+                (= (key-code) 40) "DOWN-ARROW"
+                (= (key-code) 37) "LEFT-ARROW"
+                (= (key-code) 39) "RIGHT-ARROW"
+                (= (key-code) 32) "SPACE"
+                (= (key-code) 16) "SHIFT"
+                (= (key-code) 9) "TAB"
+                (= (key-code) 8) "BACKSPACE"
+                (= (key-code) 10) "ENTER"
+                (= (key-code) 17) "CTRL"
+                (= (key-code) 18) "ALT"
+                (= (key-code) 192) "`"
+                (= (key-code) 222) "'"
+                :else (char (key-code))
+        )
 )
 
-;(defn setup []
-;	(smooth)
-;	(setup-state (cons (cons :updates updates) (cons (:states states) (flatten (vec states)))))
-;	(:setup (state :updates))
-;)
 
-;(defn draw []
-;	(map (fn[key val] (if (and (not (= key :setup)) (fn? val)) (get-value key))) (state :updates)) ;;(set-state key (val (get-value key)))))
-;)
