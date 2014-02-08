@@ -27,24 +27,28 @@
 
 (defn redraw-canvas []
 	(background-color "white")
-	(draw-food)
 )
 
-(defn draw-snake [coll]
-	(update-snake-position)
-	(redraw-canvas)
-	(let  [ x1 (get-value :snakeHeadX)
-	        y1 (get-value :snakeHeadY)
-	        x2 (get-value :foodX)
-	        y2 (get-value :foodY)
-		newcoll (vec (cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) (if (and (and (>= y1 (- y2 10)) (<= y1 (+ y2 10))) (and (>= x1 (- x2 10)) (<= x1 (+ x2 10))))
-			coll
-			(drop-last 2 coll)))))]
-	(loop [s newcoll x 0]
-		(if (= (/ (count newcoll) 2) x) newcoll
+
+;; Split up into update-snake and draw-snake
+(defn draw-snake []
+	(loop [s (get-value :snake) x 0]
+		(if (= (/ (count (get-value :snake)) 2) x) ()
 		(do (draw-rect (first s) (second s) 20 20 "green") (recur (drop 2 s) (inc x))))
 	)
-))
+)
+
+(defn update-snake [coll]
+	(update-snake-position)
+	
+	(let  [x1 (get-value :snakeHeadX)
+	       y1 (get-value :snakeHeadY)
+	       x2 (get-value :foodX)
+	       y2 (get-value :foodY)]
+	(vec (cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) (if (and (and (>= y1 (- y2 10)) (<= y1 (+ y2 10))) (and (>= x1 (- x2 10)) (<= x1 (+ x2 10))))
+			coll
+			(drop-last 2 coll))))))	
+)
 
 (defn controls []
 	(cond 
@@ -62,18 +66,30 @@
 )
 
 (def updates
-	{:setup-drawing setup :snake draw-snake}	
+	{:setup-drawing setup :update-snake update-snake}	
+)
+
+(def display-order
+	[draw-snake draw-food redraw-canvas]
 )
 
 ;; Support code
 (defn setup-sketch []
 	(smooth)
-	(setup-state (merge (hash-map :updates updates) states))
+	(setup-state (merge (hash-map :display-order display-order) (merge (hash-map :updates updates) states)))
 	((:setup-drawing (get-value :updates)))
 )
 
+(defn display []
+	(loop [s (reverse (get-value :display-order))]
+		(if (empty? s) ()
+		(do ((first s)) (recur (rest s)))))
+)
+
+;;Should call update function then display function
 (defn draw-sketch []
-	(update-state :snake (:snake (get-value :updates) (get-value :snake)))
+	(update-state :snake (:update-snake (get-value :updates) (get-value :snake)))
+	(display)
 )
 
 

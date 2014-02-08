@@ -144,31 +144,10 @@
 ))
 
 ;;key-codes
-;(defn key-input []
-;      (println (key-code))
-;      (println (keyword (key-code)))
-;	(let [key ((keyword (key-code)) list-of-key-codes)]
-;	     (if (nil? key) (char (key-code))
-;		key))
-;)
-
 (defn key-input []
-        (cond 
-                (= (key-code) 38) "UP-ARROW"
-                (= (key-code) 40) "DOWN-ARROW"
-                (= (key-code) 37) "LEFT-ARROW"
-                (= (key-code) 39) "RIGHT-ARROW"
-                (= (key-code) 32) "SPACE"
-                (= (key-code) 16) "SHIFT"
-                (= (key-code) 9) "TAB"
-                (= (key-code) 8) "BACKSPACE"
-                (= (key-code) 10) "ENTER"
-                (= (key-code) 17) "CTRL"
-                (= (key-code) 18) "ALT"
-                (= (key-code) 192) "`"
-                (= (key-code) 222) "'"
-                :else (char (key-code))
-        )
+	(let [key ((keyword (str (key-code))) list-of-key-codes)]
+	     (if (nil? key) (char (key-code))
+		key))
 )
 
 
