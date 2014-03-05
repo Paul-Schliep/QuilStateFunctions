@@ -145,8 +145,6 @@
 
 ;;key-codes
 (defn key-input []
-      (println (key-code))
-      (println (keyword (str (key-code))))
 	(let [key ((keyword (str (key-code))) list-of-key-codes)]
 	     (if (nil? key) (char (key-code))
 		key))
