@@ -1,9 +1,44 @@
-;; Esc to make it quit
-
 (ns quil-state-functions.snake
 	(:use [quil.core]
               [clojure.test]
 	      [quil-state-functions.stateFunctions])
+)
+
+(defn sqr [x]
+      (* x x)
+)
+
+(defn distance [x1 y1 x2 y2]
+       (let [bigX (max x1 x2)
+      	    bigY (max y1 y2)
+	    smallX (min x1 x2)
+	    smallY (min y1 y2)]
+	    (sqrt (+ (sqr (- bigX smallX)) (sqr (- bigY smallY)))))
+)
+
+(defn overlap? [x1 y1 x2 y2 amount]
+	    (> amount (distance x1 y1 x2 y2))
+) 
+
+(defn inSnake? [coll x y]
+      (loop [s coll]
+      	    (if (empty? s) false
+      	    	(if (overlap? (+ (first s) 10) (+ (second s) 10) x y (+ 10 (sqrt (+ (sqr 10) (sqr 10))))) true (recur (drop 2 s)))))
+)
+
+(defn inSnake2? [coll x y]
+      (loop [s coll]
+      	    (if (empty? s) false
+      	    	(if (overlap? (+ (first s) 10) (+ (second s) 10) x y 19) true (recur (drop 2 s)))))
+)
+
+(defn outOfBounds? [x y]
+      (println "In out of bounds")
+      (not (and (and (< 0 x) (> 900 x)) (and (< 0 y) (> 900 y)))) 
+)
+
+(defn gameover? []
+      (if (inSnake2? (drop 2 (get-value :snake)) (+ 10 (first (get-value :snake))) (+ 10 (second (get-value :snake)))) true (outOfBounds? (first (get-value :snake)) (second (get-value :snake))))
 )
 
 (defn setup []
@@ -21,8 +56,23 @@
 	)
 )
 
+(defn random-food-helper []
+      [(+ 20 (rand-int 860)) (+ 20 (rand-int 860))]
+)
+
+(defn random-food [coll]
+      (if (inSnake? (get-value :snake) (first coll) (second coll)) (random-food (random-food-helper)) coll)  
+)
+
+
+(defn update-food [coll]
+      (if (overlap? (+ 10 (get-value :snakeHeadX)) (+ 10 (get-value :snakeHeadY)) (first (get-value :foodPosition)) (second (get-value :foodPosition)) (+ 10 (sqrt (+ (sqr 10) (sqr 10)))))
+      	  (random-food (random-food-helper))
+	  coll)
+)
+
 (defn draw-food []
-	(draw-circle (get-value :foodX) (get-value :foodY) 20 "yellow")
+	(draw-circle (first (get-value :foodPosition)) (second (get-value :foodPosition)) 20 "yellow")
 )
 
 (defn redraw-canvas []
@@ -40,12 +90,12 @@
 
 (defn update-snake [coll]
 	(update-snake-position)
-
+	(if (gameover?) (frame-rate 0))
 	(let  [x1 (get-value :snakeHeadX)
 	       y1 (get-value :snakeHeadY)
-	       x2 (get-value :foodX)
-	       y2 (get-value :foodY)]
-	(vec (cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) (if (and (and (>= y1 (- y2 10)) (<= y1 (+ y2 10))) (and (>= x1 (- x2 10)) (<= x1 (+ x2 10))))
+	       x2 (first (get-value :foodPosition))
+	       y2 (second (get-value :foodPosition))]
+	(vec (cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) (if (overlap? (+ x1 10) (+ y1 10) x2 y2 (+ 10 (sqrt (+ (sqr 10) (sqr 10)))))
 			coll
 			(drop-last 2 coll))))))
 )
@@ -62,15 +112,15 @@
 
 ;; Student code
 (def states
-	{:snake [450 450 450 470 450 490 450 510] :snakeHeadX 450 :snakeHeadY 450 :foodX 150 :foodY 150 :snake-direction "north" :foodExists false :score 0}
+	{:snake [450 450 450 470 450 490 450 510] :snakeHeadX 450 :snakeHeadY 450 :foodPosition [150 150] :snake-direction "north" :foodExists false :score 0}
 )
 
 (def updates
-	{:setup-drawing setup :update-snake update-snake}
+	{:setup-drawing setup :update-snake update-snake :update-food update-food}
 )
 
 (def display-order
-	[draw-snake draw-food redraw-canvas]
+	[redraw-canvas draw-food draw-snake]
 )
 
 ;; Support code
@@ -81,14 +131,15 @@
 )
 
 (defn display []
-	(loop [s (reverse (get-value :display-order))]
+	(loop [s (get-value :display-order)]
 		(if (empty? s) ()
 		(do ((first s)) (recur (rest s)))))
 )
 
 ;;Should call update function then display function
 (defn draw-sketch []
-	(update-state :snake (:update-snake (get-value :updates) (get-value :snake)))
+	(update-state :snake ((:update-snake (get-value :updates)) (get-value :snake)))
+	(update-state :foodPosition ((:update-food (get-value :updates)) (get-value :foodPosition)))
 	(display)
 )
 

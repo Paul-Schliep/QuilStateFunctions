@@ -29,12 +29,10 @@
 	(background-color "white")
 )
 
-
-;; Split up into update-snake and draw-snake
 (defn draw-snake []
 	(loop [s (get-value :snake) x 0]
 		(if (= (/ (count (get-value :snake)) 2) x) ()
-		(do (draw-rect (first s) (second s) 20 20 "green") (recur (drop 2 s) (inc x))))
+		(do (draw-rect (first s) (second s) 20 20 "green" 255) (recur (drop 2 s) (inc x))))
 	)
 )
 
@@ -83,7 +81,7 @@
 (defn display []
 	(loop [s (reverse (get-value :display-order))]
 		(if (empty? s) ()
-		(do (println ((first s))) (recur (rest s)))))
+		(do ((first s)) (recur (rest s)))))
 )
 
 ;;Should call update function then display function
