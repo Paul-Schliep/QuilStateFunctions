@@ -16,7 +16,7 @@
      {:38 "UP-ARROW" :40 "DOWN-ARROW" :37 "LEFT-ARROW" :39 "RIGHT-ARROW" :32 "SPACE" :16 "SHIFT" :9 "TAB" :8 "BACKSPACE" :10 "ENTER" :17 "CTRL" :18 "ALT" :192 "`" :222 "'"}
 )
 
-(defn wrap-var [kv]
+(defn wrap-ref [kv]
 	(let [key (first kv)
 	      val (second kv)]
 	(ref val))
@@ -24,7 +24,7 @@
 
 (defn setup-state [coll]
 	;(if (map? coll) (apply set-state! (vec (interleave (map (fn [key var] key) coll) (map (fn [key var] (if (fn? var) var (ref var))) coll)))))
-	(apply set-state! (interleave (keys coll) (map wrap-var coll)))
+	(apply set-state! (interleave (keys coll) (map wrap-ref coll)))
 )
 
 (defn update-state [key set]
