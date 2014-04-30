@@ -23,7 +23,6 @@
 )
 
 (defn setup-state [coll]
-	;(if (map? coll) (apply set-state! (vec (interleave (map (fn [key var] key) coll) (map (fn [key var] (if (fn? var) var (ref var))) coll)))))
 	(apply set-state! (interleave (keys coll) (map wrap-ref coll)))
 )
 

@@ -5,7 +5,7 @@
 )
 
 (def states
-	{:snake [450 750 450 770 450 790 450 810] :snakeHeadX 450 :snakeHeadY 750 :foodPosition [150 150] :snake-direction "north" :score 0}
+	{:snake [450 750 450 770 450 790 450 810] :snakeHeadX 450 :snakeHeadY 750 :food [150 150] :snake-direction "north" :score 0}
 )
 
 (defn reset-game-state []
@@ -75,19 +75,19 @@
 
 
 (defn update-food [coll]
-    (if (overlap? (+ 10 (get-value :snakeHeadX)) (+ 10 (get-value :snakeHeadY)) (first (get-value :foodPosition)) (second (get-value :foodPosition)) (+ 10 (sqrt (+ (sqr 10) (sqr 10)))))
+    (if (overlap? (+ 10 (get-value :snakeHeadX)) (+ 10 (get-value :snakeHeadY)) (first (get-value :food)) (second (get-value :food)) (+ 10 (sqrt (+ (sqr 10) (sqr 10)))))
       (random-food (random-food-helper))
 	    coll)
 )
 
 (defn update-score [val]
-  (if (overlap? (+ 10 (get-value :snakeHeadX)) (+ 10 (get-value :snakeHeadY)) (first (get-value :foodPosition)) (second (get-value :foodPosition)) (+ 10 (sqrt (+ (sqr 10) (sqr 10)))))
+  (if (overlap? (+ 10 (get-value :snakeHeadX)) (+ 10 (get-value :snakeHeadY)) (first (get-value :food)) (second (get-value :food)) (+ 10 (sqrt (+ (sqr 10) (sqr 10)))))
     (inc val)
     val)
 )
 
-(defn draw-food []
-	(draw-circle (first (get-value :foodPosition)) (second (get-value :foodPosition)) 20 "yellow")
+(defn draw-food [food]
+	(draw-circle (first food) (second food) 20 "yellow")
 )
 
 (defn redraw-canvas []
@@ -97,9 +97,9 @@
 
 
 ;; Split up into update-snake and draw-snake
-(defn draw-snake []
-	(loop [s (get-value :snake) x 0]
-		(if (= (/ (count (get-value :snake)) 2) x) ()
+(defn draw-snake [snake]
+	(loop [s snake x 0]
+		(if (= (/ (count snake) 2) x) ()
 		(do (draw-rect (first s) (second s) 20 20 "green") (recur (drop 2 s) (inc x))))
 	)
 )
@@ -109,8 +109,8 @@
   (if (gameover?) (reset-game-state)
 	(do (let  [x1 (get-value :snakeHeadX)
 	       y1 (get-value :snakeHeadY)
-	       x2 (first (get-value :foodPosition))
-	       y2 (second (get-value :foodPosition))]
+	       x2 (first (get-value :food))
+	       y2 (second (get-value :food))]
 	(vec (cons (get-value :snakeHeadX) (cons (get-value :snakeHeadY) (if (overlap? (+ x1 10) (+ y1 10) x2 y2 (+ 10 (sqrt (+ (sqr 10) (sqr 10)))))
 			coll
 			(drop-last 2 coll))))))))
@@ -130,27 +130,29 @@
 )
 
 (def display-order
-	[redraw-canvas draw-food draw-snake]
+	{:canvas redraw-canvas :food draw-food :snake draw-snake}
 )
 
 ;; Support code
 (defn setup-sketch []
 	(smooth)
-	(setup-state (merge (hash-map :display-order display-order) (merge (hash-map :updates updates) states)))
+	(setup-state (merge (merge (hash-map :display-order display-order) (merge (hash-map :updates updates) states)) (hash-map :states states)))
 	((:setup-drawing (get-value :updates)))
 )
 
 (defn display []
 	(loop [s (get-value :display-order)]
 		(if (empty? s) ()
-		(do ((first s)) (recur (rest s)))))
+		(do  (let [key (first (first s))
+	      	   fun (second (first s))] (if (contains? (get-value :states) key) (fun (get-value key)) (fun)))
+      		   (recur (rest s)))))
 )
 
 ;;Should call update function then display function
 (defn draw-sketch []
 	(update-state :snake ((:update-snake (get-value :updates)) (get-value :snake)))
-  (update-state :score ((:update-score (get-value :updates)) (get-value :score)))
-	(update-state :foodPosition ((:update-food (get-value :updates)) (get-value :foodPosition)))
+  	(update-state :score ((:update-score (get-value :updates)) (get-value :score)))
+	(update-state :food ((:update-food (get-value :updates)) (get-value :food)))
 	(display)
 )
 
