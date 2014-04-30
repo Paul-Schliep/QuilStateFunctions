@@ -90,7 +90,7 @@
 	(draw-circle (first food) (second food) 20 "yellow")
 )
 
-(defn redraw-canvas []
+(defn draw-canvas []
 	(background-color "white")
   (write-text (str "Score: " (get-value :score)) 15 400 100)
 )
@@ -126,11 +126,11 @@
 )
 
 (def updates
-	{:setup-drawing setup :update-snake update-snake :update-score update-score :update-food update-food}
+	{:setup-drawing setup :snake update-snake :score update-score :food update-food}
 )
 
 (def display-order
-	{:canvas redraw-canvas :food draw-food :snake draw-snake}
+	{:canvas draw-canvas :food draw-food :snake draw-snake}
 )
 
 ;; Support code
@@ -148,11 +148,17 @@
       		   (recur (rest s)))))
 )
 
+(defn update []
+      (loop [s (rest (get-value :updates))]
+      	    (if (empty? s) ()
+	    	(do (let [key (first (first s))
+		     fun (second (first s))]
+		     (update-state key (fun (get-value key))) (recur (rest s))))))
+)
+
 ;;Should call update function then display function
 (defn draw-sketch []
-	(update-state :snake ((:update-snake (get-value :updates)) (get-value :snake)))
-  	(update-state :score ((:update-score (get-value :updates)) (get-value :score)))
-	(update-state :food ((:update-food (get-value :updates)) (get-value :food)))
+	(update)
 	(display)
 )
 
